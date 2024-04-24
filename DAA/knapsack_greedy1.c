@@ -1,33 +1,78 @@
-#include <stdio.h>
-int n = 5;
-int p[10] = {3, 3, 2, 5, 1};
-int w[10] = {10, 15, 10, 12, 8};
-int W = 10;
-int main(){
-   int cur_w; 
-   float tot_v; 
-   int i, maxi;
-   int used[10];
-   for (i = 0; i < n; ++i)
-      used[i] = 0;
-   cur_w = W;
-   while (cur_w > 0) {
-      maxi = -1;
-      for (i = 0; i < n; ++i)
-         if ((used[i] == 0) &&
-               ((maxi == -1) || ((float)w[i]/p[i] > (float)w[maxi]/p[maxi])))
-            maxi = i;
-      used[maxi] = 1;
-      cur_w -= p[maxi];
-      tot_v += w[maxi];
-      if (cur_w >= 0)
-         printf("Added object %d (%d, %d) completely in the bag. Space left: %d.\n", maxi + 1, w[maxi], p[maxi], cur_w);
-      else {
-         printf("Added %d%% (%d, %d) of object %d in the bag.\n", (int)((1 + (float)cur_w/p[maxi]) * 100), w[maxi], p[maxi], maxi + 1);
-         tot_v -= w[maxi];
-         tot_v += (1 + (float)cur_w/p[maxi]) * w[maxi];
-      }
-   }
-   printf("Filled the bag with objects worth %.2f.\n", tot_v);
-   return 0;
+#include<stdio.h>
+
+void swap(float *a , float *b)
+{
+    float temp;
+    temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void fractional_knapsack(int n , float weight[] , float profit[] , float capacity)
+{
+    float M = capacity, total_profit=0.0 , x[n];
+    int i;
+    for(i=0 ; i<n ; i++)
+    {
+        x[i]=0.0;
+    }
+
+    for(i=0;i<n;i++)
+    {
+        if(weight[i]>M)
+        {
+            break;
+        }
+        else
+        {
+            x[i]=1.0;
+            M= M-weight[i];
+            total_profit += profit[i];
+        }
+    }
+    if(i<n)
+    {
+        x[i]=M/weight[i];
+        total_profit+= x[i]*profit[i];
+    }
+    printf("Fraction of elements used : ");
+    for(i=0;i<n;i++)
+    {
+        printf("%f ",x[i] );
+    }
+    printf("\nMaximum profit : %f\n",total_profit);
+}
+
+int main()
+{
+    int n;
+    printf("Enter the number of elements: ");
+    scanf("%d",&n);
+    float w[n], p[n],ratio[n],m;
+    int i,j;
+    printf("Enter the corresponding weight and profit:\n");
+    for(i=0;i<n ; i++)
+    {
+        scanf("%f%f", &w[i],&p[i]);
+    }
+    printf("Enter the capacity: ");
+    scanf("%f", &m);
+    for(i=0;i<n;i++)
+    {
+        ratio[i]=p[i]/w[i];
+    }
+    for(i=0;i<n;i++)
+    {
+        for(j=i+1;j<n;j++)
+        {
+            if(ratio[i]<ratio[j])
+            {
+                swap(&ratio[i], &ratio[j]);
+                swap(&w[i],&w[j]);
+                swap(&p[i], &p[j]);
+            }
+        }
+    }
+    fractional_knapsack(n,w,p,m);
+    return 0;
 }
